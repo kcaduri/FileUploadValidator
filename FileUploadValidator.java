@@ -19,7 +19,8 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 public class FileUploadValidator {
-    private static final String QUARANTINE_FOLDER = "/path/to/quarantine/folder/";
+    private static final String QUARANTINE_FOLDER = "/path/to/quarantine/folder/"; 
+    //Make sure to update the QUARENTINE_FOLDER variable to actual path to your quarentine folder.
     private static final Pattern FILENAME_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.-]+$");
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".docx", ".xlsx", ".xls", ".pptx", ".txt");
 
@@ -170,32 +171,32 @@ public class FileUploadValidator {
     }
 
     private static void processPDF(String filePath) {
-        // Process the uploaded PDF file
+        // Process the uploaded PDF file, only display file path in logs if need, from a security standpoint this should be set to a generic message.
         System.out.println("Processing the uploaded PDF: " + getFileDisplayName(filePath));
     }
 
     private static void processWord(String filePath) {
-        // Process the uploaded Word file
+        //Process the uploaded PDF file, only display file path in logs if need, from a security standpoint this should be set to a generic message.
         System.out.println("Processing the uploaded Word document: " + getFileDisplayName(filePath));
     }
 
     private static void processExcel(String filePath) {
-        // Process the uploaded Excel file
+        // Process the uploaded PDF file, only display file path in logs if need, from a security standpoint this should be set to a generic message.
         System.out.println("Processing the uploaded Excel spreadsheet: " + getFileDisplayName(filePath));
     }
 
     private static void processPowerPoint(String filePath) {
-        // Process the uploaded PowerPoint file
+        // Process the uploaded PDF file, only display file path in logs if need, from a security standpoint this should be set to a generic message.
         System.out.println("Processing the uploaded PowerPoint presentation: " + getFileDisplayName(filePath));
     }
 
     private static void processText(String filePath) {
-        // Process the uploaded text file
+        // Process the uploaded PDF file, only display file path in logs if need, from a security standpoint this should be set to a generic message.
         System.out.println("Processing the uploaded text file: " + getFileDisplayName(filePath));
     }
 
     private static String getFileDisplayName(String filePath) {
-        // Returns the file name without the path
+        // Process the uploaded PDF file, only display file path in logs if need, from a security standpoint this should be set to a generic message.
         return new File(filePath).getName();
     }
 
