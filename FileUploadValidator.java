@@ -84,7 +84,7 @@ public class FileUploadValidator {
     }
 
     public static void main(String[] args) {
-        String filePath = "path/to/uploaded/file.xlsx";
+        String filePath = "path/to/uploaded/file.xlsx"; //set Filepath varible per your application
 
         try {
             String fileName = getFileName(filePath);
