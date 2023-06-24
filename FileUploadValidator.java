@@ -14,11 +14,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 public class FileUploadValidator {
     private static final String QUARANTINE_FOLDER = "/path/to/quarantine/folder/";
     private static final Pattern FILENAME_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.-]+$");
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".docx", ".xlsx", ".xls", ".pptx", ".txt");
 
     public static boolean isPasswordProtected(String filePath, FileType fileType) throws IOException {
         switch (fileType) {
@@ -81,7 +84,6 @@ public class FileUploadValidator {
 
     public static void main(String[] args) {
         String filePath = "path/to/uploaded/file.xlsx";
-        FileType fileType = getFileType(filePath);
 
         try {
             String fileName = getFileName(filePath);
@@ -89,17 +91,24 @@ public class FileUploadValidator {
                 // Reject the file and move it to the quarantine folder
                 quarantineFile(filePath);
                 System.out.println("Invalid file name. Only alphanumeric characters, hyphens, spaces, and periods are allowed.");
-            } else if (isPasswordProtected(filePath, fileType)) {
+            } else if (!isFileTypeValid(filePath)) {
                 // Reject the file and move it to the quarantine folder
                 quarantineFile(filePath);
-                System.out.println("Password-protected files are not allowed.");
-            } else if (hasMaliciousContent(filePath)) {
-                // Reject the file and move it to the quarantine folder
-                quarantineFile(filePath);
-                System.out.println("The file contains malicious content.");
+                System.out.println("Invalid file type or extension.");
             } else {
-                // Continue processing the uploaded file
-                processUploadedFile(filePath, fileType);
+                FileType fileType = getFileType(filePath);
+                if (isPasswordProtected(filePath, fileType)) {
+                    // Reject the file and move it to the quarantine folder
+                    quarantineFile(filePath);
+                    System.out.println("Password-protected files are not allowed.");
+                } else if (hasMaliciousContent(filePath)) {
+                    // Reject the file and move it to the quarantine folder
+                    quarantineFile(filePath);
+                    System.out.println("The file contains malicious content.");
+                } else {
+                    // Continue processing the uploaded file
+                    processUploadedFile(filePath, fileType);
+                }
             }
         } catch (IOException e) {
             // Handle exceptions securely (log, display an error message, etc.)
@@ -122,6 +131,19 @@ public class FileUploadValidator {
         } else {
             return FileType.UNKNOWN;
         }
+    }
+
+    private static boolean isFileTypeValid(String filePath) {
+        String fileExtension = getFileExtension(filePath);
+        return ALLOWED_EXTENSIONS.contains(fileExtension.toLowerCase());
+    }
+
+    private static String getFileExtension(String filePath) {
+        int extensionIndex = filePath.lastIndexOf('.');
+        if (extensionIndex >= 0 && extensionIndex < filePath.length() - 1) {
+            return filePath.substring(extensionIndex);
+        }
+        return "";
     }
 
     private static void processUploadedFile(String filePath, FileType fileType) {
