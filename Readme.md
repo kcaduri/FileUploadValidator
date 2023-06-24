@@ -47,4 +47,6 @@ Additionally, make sure to create the quarantine directory before running the co
 
 Remember to have the necessary dependencies in your project for Apache POI and ClamAV, and ensure that the ClamAV daemon is running on the local machine.
 
-V6 - In this updated code, the filename validation is performed using a regular expression pattern. If the filename is invalid, the file is rejected and moved to the quarantine folder. The filepath is not disclosed in any of the output messages. Exceptions are handled securely by printing a generic error message and stack trace is not printed.
+V6 - In this modified code, the file paths are no longer disclosed, exceptions are securely handled, and rejected files are quarantined by moving them to a specified folder. Make sure to update the QUARANTINE_FOLDER variable with the actual path to your quarantine folder.
+
+V7 - In this updated code, the filename validation is performed using a regular expression pattern. If the filename is invalid, the file is rejected and moved to the quarantine folder. The filepath is not disclosed in any of the output messages. Exceptions are handled securely by printing a generic error message and stack trace is not printed.
