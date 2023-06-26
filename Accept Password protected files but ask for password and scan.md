@@ -74,3 +74,120 @@ private static boolean isPasswordCorrectPDF(String filePath, String password) {
 Make sure to update the code accordingly for other file types if needed.
 
 With these modifications, when a password-protected file is detected, the program will prompt the user to enter the password. If the password is correct, the file will continue to be processed. Otherwise, the file will be moved to the quarantine folder.
+
+Full code will look something like this
+
+
+java
+Copy code
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xslf.usermodel.XMLSlideShow;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.clamav4j.ClamAVClient;
+import org.clamav4j.ScanResult;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.regex.Pattern;
+
+public class FileUploadValidator {
+    private static final String QUARANTINE_FOLDER = "/path/to/quarantine/folder/";
+    private static final Pattern FILENAME_PATTERN = Pattern.compile("^[a-zA-Z0-9\\s.-]+$");
+    private static final Set<String> ALLOWED_EXTENSIONS = Set.of(".pdf", ".docx", ".xlsx", ".xls", ".pptx", ".txt");
+
+    public static boolean hasMaliciousContent(String filePath, String password) {
+        try (ClamAVClient client = new ClamAVClient("localhost", 3310)) {
+            byte[] fileBytes = Files.readAllBytes(Path.of(filePath));
+            ScanResult result = client.scan(fileBytes, password);
+            return result.isInfected();
+        } catch (IOException e) {
+            // Handle exceptions securely (log, display an error message, etc.)
+            return false;
+        }
+    }
+
+    public static void quarantineFile(String filePath) {
+        try {
+            Path sourceFile = Path.of(filePath);
+            Path targetFile = Path.of(QUARANTINE_FOLDER, sourceFile.getFileName().toString());
+            Files.move(sourceFile, targetFile, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            // Handle exceptions securely (log, display an error message, etc.)
+        }
+    }
+
+    public static void processUploadedFile(String filePath) {
+        // Implement the logic to process the uploaded file here
+        System.out.println("Processing file: " + filePath);
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter the file path: ");
+        String filePath = scanner.nextLine();
+
+        FileType fileType = getFileType(filePath);
+
+        if (fileType == FileType.UNKNOWN) {
+            System.out.println("Unsupported file format.");
+            return;
+        }
+
+        if (!isValidFileName(filePath)) {
+            System.out.println("Invalid file name.");
+            return;
+        }
+
+        System.out.print("Enter the password for the file: ");
+        String password = scanner.nextLine();
+
+        if (hasMaliciousContent(filePath, password)) {
+            quarantineFile(filePath);
+            System.out.println("The file contains malicious content.");
+        } else {
+            processUploadedFile(filePath);
+        }
+    }
+
+    private static FileType getFileType(String filePath) {
+        if (filePath.endsWith(".pdf")) {
+            return FileType.PDF;
+        } else if (filePath.endsWith(".docx")) {
+            return FileType.WORD;
+        } else if (filePath.endsWith(".xlsx") || filePath.endsWith(".xls")) {
+            return FileType.EXCEL;
+        } else if (filePath.endsWith(".pptx")) {
+            return FileType.POWERPOINT;
+        } else if (filePath.endsWith(".txt")) {
+            return FileType.TEXT;
+        } else {
+            return FileType.UNKNOWN;
+        }
+    }
+
+    private static boolean isValidFileName(String filePath) {
+        String fileName = new File(filePath).getName();
+        return FILENAME_PATTERN.matcher(fileName).matches();
+    }
+
+    private enum FileType {
+        PDF,
+        WORD,
+        EXCEL,
+        POWERPOINT,
+        TEXT,
+        UNKNOWN
+    }
+}
+Please note that you need to replace /path/to/quarantine/folder/ with the actual path to your quarantine folder.
