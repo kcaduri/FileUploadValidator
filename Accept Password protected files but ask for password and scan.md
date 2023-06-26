@@ -77,9 +77,7 @@ With these modifications, when a password-protected file is detected, the progra
 
 Full code will look something like this
 
-
-java
-Copy code
+```java
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -178,7 +176,9 @@ public class FileUploadValidator {
 
     private static boolean isValidFileName(String filePath) {
         String fileName = new File(filePath).getName();
-        return FILENAME_PATTERN.matcher(fileName).matches();
+       
+
+ return FILENAME_PATTERN.matcher(fileName).matches();
     }
 
     private enum FileType {
@@ -190,4 +190,6 @@ public class FileUploadValidator {
         UNKNOWN
     }
 }
-Please note that you need to replace /path/to/quarantine/folder/ with the actual path to your quarantine folder.
+```
+
+Please note that you need to replace `/path/to/quarantine/folder/` with the actual path to your quarantine folder.
