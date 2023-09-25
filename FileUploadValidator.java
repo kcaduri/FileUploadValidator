@@ -1,4 +1,5 @@
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.interactive.action.PDActionJavaScript;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -45,6 +46,24 @@ public class FileUploadValidator {
         try (PDDocument document = PDDocument.load(new File(filePath))) {
             return document.isEncrypted();
         }
+    }
+
+     private static boolean containsJavaScriptInPDF(String filePath) throws IOException {
+        try (PDDocument document = PDDocument.load(new File(filePath))) {
+            if (document.isEncrypted()) {
+                return false; // Cannot inspect encrypted files
+            }
+            // Check for OpenAction JavaScript
+            if (document.getDocumentCatalog().getOpenAction() instanceof PDActionJavaScript) {
+                return true;
+            }
+            // Check for JavaScript in the Names dictionary
+            if (document.getDocumentCatalog().getNames() != null 
+                && document.getDocumentCatalog().getNames().getJavaScript() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean isPasswordProtectedWord(String filePath) throws IOException {
@@ -106,6 +125,9 @@ public class FileUploadValidator {
                     // Reject the file and move it to the quarantine folder
                     quarantineFile(filePath);
                     System.out.println("The file contains malicious content.");
+                } else if (fileType == FileType.PDF && containsJavaScriptInPDF(filePath)) {
+                    quarantineFile(filePath);
+                    System.out.println("The PDF contains JavaScript, which is not allowed."); 
                 } else {
                     // Continue processing the uploaded file
                     processUploadedFile(filePath, fileType);
