@@ -50,3 +50,6 @@ Remember to have the necessary dependencies in your project for Apache POI and C
 V6 - In this modified code, the file paths are no longer disclosed, exceptions are securely handled, and rejected files are quarantined by moving them to a specified folder. Make sure to update the QUARANTINE_FOLDER variable with the actual path to your quarantine folder.
 
 V7 - In this updated code, the filename validation is performed using a regular expression pattern. If the filename is invalid, the file is rejected and moved to the quarantine folder. The filepath is not disclosed in any of the output messages. Exceptions are handled securely by printing a generic error message and stack trace is not printed.
+
+V8 - This code introduces the containsJavaScriptInPDF method to inspect the PDF for potential JavaScript content and integrates the method within your main method.
+Remember, this approach may give you some false positives, as not all JavaScript embedded within a PDF is malicious or even active. If you need a more sophisticated analysis, consider other specialized tools or libraries.  
